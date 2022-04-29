@@ -34,8 +34,7 @@ pub fn const_version(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
                     const MAJOR: u64 = #major;
                     const MINOR: u64 = #minor;
                     const PATCH: u64 = #patch;
-                    const VERSION: Version = Version::new(MAJOR, MINOR, PATCH);
-                    VERSION
+                    fast_version_core::version::Version::new(MAJOR, MINOR, PATCH)
                 }
             }.into()
         }

@@ -36,7 +36,7 @@ lazy_static! {
 /// assert_eq!(VERSION.minor, 2);
 /// assert_eq!(VERSION.patch, 3);
 /// ```
-#[derive(Debug, Copy, Clone)]
+#[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Version {
     pub major: u64,

@@ -2,51 +2,81 @@ use crate::version::Version;
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
 
+/// The variants in which a version requirenment can be constructed.
 #[non_exhaustive]
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum VersionReqVariant {
+    /// Equivalent of "1.2.3" where `1.2.3` is the only version this requirenment will match to.
     Strict(Version),
+    /// Composition of an lower and an upper bound.
     Compound(VersionReqVariantLowerBound, VersionReqVariantUpperBound),
+    /// Equivalent of ">1"
     MajorGreater { major: u64 },
+    /// Equivalent of ">1.2"
     MinorGreater { major: u64, minor: u64 },
+    /// Equivalent of ">1.2.3"
     PatchGreater { major: u64, minor: u64, patch: u64 },
+    /// Equivalent of ">=1"
     MajorGreaterEqual { major: u64 },
+    /// Equivalent of ">=1.2"
     MinorGreaterEqual { major: u64, minor: u64 },
+    /// Equivalent of ">=1.2.3"
     PatchGreaterEqual { major: u64, minor: u64, patch: u64 },
+    /// Equivalent of "<1"
     MajorLess { major: u64 },
+    /// Equivalent of "<1.2"
     MinorLess { major: u64, minor: u64 },
+    /// Equivalent of "<1.2.3"
     PatchLess { major: u64, minor: u64, patch: u64 },
+    /// Equivalent of "<=1"
     MajorLessEqual { major: u64 },
+    /// Equivalent of "<=1.2"
     MinorLessEqual { major: u64, minor: u64 },
+    /// Equivalent of "<=1.2.3"
     PatchLessEqual { major: u64, minor: u64, patch: u64 },
 }
 
+/// Lower bound part of [VersionReqVariant::Compound]
 #[non_exhaustive]
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum VersionReqVariantLowerBound {
+    /// Equivalent of ">1"
     MajorGreater { major: u64 },
+    /// Equivalent of ">1.2"
     MinorGreater { major: u64, minor: u64 },
+    /// Equivalent of ">1.2.3"
     PatchGreater { major: u64, minor: u64, patch: u64 },
+    /// Equivalent of ">=1"
     MajorGreaterEqual { major: u64 },
+    /// Equivalent of ">=1.2"
     MinorGreaterEqual { major: u64, minor: u64 },
+    /// Equivalent of ">=1.2.3"
     PatchGreaterEqual { major: u64, minor: u64, patch: u64 },
 }
 
+/// Lower bound part of [VersionReqVariant::Compound]
 #[non_exhaustive]
-#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum VersionReqVariantUpperBound {
+    /// Equivalent of "<1"
     MajorLess { major: u64 },
+    /// Equivalent of "<1.2"
     MinorLess { major: u64, minor: u64 },
+    /// Equivalent of "<1.2.3"
     PatchLess { major: u64, minor: u64, patch: u64 },
+    /// Equivalent of "<=1"
     MajorLessEqual { major: u64 },
+    /// Equivalent of "<=1.2"
     MinorLessEqual { major: u64, minor: u64 },
+    /// Equivalent of "<=1.2.3"
     PatchLessEqual { major: u64, minor: u64, patch: u64 },
 }
 
-#[derive(Clone, Copy)]
+/// Representing an actual version requirenment, normally constructed through [VersionReq::new].
+#[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct VersionReq {
     pub(crate) major_lower: u64,
@@ -58,9 +88,10 @@ pub struct VersionReq {
 }
 
 impl VersionReq {
+    /// Equivalent of "*"
     pub const STAR: Self = Self::star();
 
-    pub const fn star() -> Self {
+    const fn star() -> Self {
         const MAX: u64 = u64::MAX;
         const MIN: u64 = u64::MIN;
         Self {
@@ -73,7 +104,8 @@ impl VersionReq {
         }
     }
 
-
+    /// checks wether the Version Requirenment matches with the version. Returnes true if the
+    /// Requirenments are met.
     pub const fn matches(&self, version: &Version) -> bool {
         let lower_match = self.major_lower <= version.major
             && self.minor_lower <= version.minor
@@ -84,6 +116,7 @@ impl VersionReq {
         lower_match && higher_match
     }
 
+    /// Normal constructer of the Version Requirenment.
     pub const fn new(version_req: &VersionReqVariant) -> Self {
         match version_req {
             VersionReqVariant::Strict(d) => Self::new_strict(d),

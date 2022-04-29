@@ -7,8 +7,8 @@ edition = "2021"
 members = [".", "fast-version-derive", "fast-version-core"]
 
 [dependencies]
-fast-version-core = { path = "fast-version-core" }
-fast-version-derive = { path = "fast-version-derive" }
+fast-version-core = {version = "0.1.1", path = "fast-version-core" }
+fast-version-derive = {version = "0.1.1", path = "fast-version-derive" }
 
 [features]
 default = ["alloc"]

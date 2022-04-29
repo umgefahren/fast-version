@@ -1,6 +1,6 @@
 [package]
 name = "fast-version-derive"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 description = "Derive macro for the fast-version crate"
@@ -12,4 +12,4 @@ proc_macro = true
 [dependencies]
 quote = "1.0.18"
 litrs = "0.2.3"
-fast-version-core = { version = "0.1.0", path = "../fast-version-core" }
+fast-version-core = { version = "0.1.1", path = "../fast-version-core" }
