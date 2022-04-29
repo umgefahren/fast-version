@@ -1,3 +1,6 @@
+//! ![license shield](https://img.shields.io/badge/license-MIT-green) ![crates.io
+//! shield](https://img.shields.io/crates/v/fast-version)
+//!
 //! Utility crate for fast SemVer **like** Versions and Version Requirenments. If you look for full
 //! SemVer experience and/or easy usage, please consider the excellent
 //! [semver](https://docs.rs/semver/latest/semver/index.html) crate.
