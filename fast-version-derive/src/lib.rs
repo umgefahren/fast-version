@@ -1,3 +1,7 @@
+//! Derive macro defintion for the fast-version crate
+//!
+//! Refer to the [fast-version](https://crates.io/crates/fast-version) for usage and documentation. 
+
 use litrs::Literal;
 use quote::quote;
 use std::str::FromStr;
