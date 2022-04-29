@@ -1,6 +1,6 @@
 //! Derive macro defintion for the fast-version crate
 //!
-//! Refer to the [fast-version](https://crates.io/crates/fast-version) for usage and documentation. 
+//! Refer to the [fast-version](https://crates.io/crates/fast-version) for usage and documentation.
 
 use litrs::Literal;
 use quote::quote;
@@ -36,7 +36,8 @@ pub fn const_version(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
                     const PATCH: u64 = #patch;
                     fast_version_core::version::Version::new(MAJOR, MINOR, PATCH)
                 }
-            }.into()
+            }
+            .into()
         }
         Ok(other) => {
             panic!("Got non string literal: {}", other);

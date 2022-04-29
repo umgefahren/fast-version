@@ -21,7 +21,7 @@
 //! assert_eq!(VERSION.patch, 3);
 //!
 //! const VERSION_REQ_MATCH: VersionReq = {
-//!     let version_req_variant = VersionReqVariant::Strict(VERSION); 
+//!     let version_req_variant = VersionReqVariant::Strict(VERSION);
 //!     VersionReq::new(&version_req_variant)
 //! };
 //!
@@ -34,7 +34,6 @@
 //!
 //! assert!(!VERSION_REQ_UNMATCH.matches(&VERSION));
 //! ```
-
 
 pub use fast_version_core::version::Version;
 pub use fast_version_core::version_req::*;

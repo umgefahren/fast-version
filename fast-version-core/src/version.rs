@@ -1,9 +1,9 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use thiserror::Error;
-#[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
 
 lazy_static! {
     static ref VERSION_RE: Regex = Regex::new("([0-9]+).([0-9]+).([0-9]+)").unwrap();
@@ -44,14 +44,13 @@ pub struct Version {
     pub patch: u64,
 }
 
-
 impl Version {
     /// Create a new version from major, minor and patch.
     /// ```
     /// # use fast_version_core::version::Version;
     ///
     /// let version = Version::new(1, 2, 3);
-    /// 
+    ///
     /// assert_eq!(version.major, 1);
     /// assert_eq!(version.minor, 2);
     /// assert_eq!(version.patch, 3);

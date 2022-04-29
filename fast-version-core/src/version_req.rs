@@ -1,6 +1,6 @@
 use crate::version::Version;
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// The variants in which a version requirenment can be constructed.
 #[non_exhaustive]
@@ -124,39 +124,63 @@ impl VersionReq {
             VersionReqVariant::MajorGreater { major } => {
                 let major_geq = major.saturating_add(1);
                 Self::new_lower_bounded_equal(major_geq, 0, 0)
-            },
+            }
             VersionReqVariant::MinorGreater { major, minor } => {
                 let major_geq = major.saturating_add(1);
                 let minor_geq = minor.saturating_add(1);
                 Self::new_lower_bounded_equal(major_geq, minor_geq, 0)
-            },
-            VersionReqVariant::PatchGreater { major, minor, patch } => {
+            }
+            VersionReqVariant::PatchGreater {
+                major,
+                minor,
+                patch,
+            } => {
                 let major_geq = major.saturating_add(1);
                 let minor_geq = minor.saturating_add(1);
                 let patch_geq = patch.saturating_add(1);
                 Self::new_lower_bounded_equal(major_geq, minor_geq, patch_geq)
-            },
-            VersionReqVariant::MajorGreaterEqual { major } => Self::new_lower_bounded_equal(*major, 0, 0),
-            VersionReqVariant::MinorGreaterEqual { major, minor } => Self::new_lower_bounded_equal(*major, *minor, 0),
-            VersionReqVariant::PatchGreaterEqual { major, minor, patch } => Self::new_lower_bounded_equal(*major, *minor, *patch),
+            }
+            VersionReqVariant::MajorGreaterEqual { major } => {
+                Self::new_lower_bounded_equal(*major, 0, 0)
+            }
+            VersionReqVariant::MinorGreaterEqual { major, minor } => {
+                Self::new_lower_bounded_equal(*major, *minor, 0)
+            }
+            VersionReqVariant::PatchGreaterEqual {
+                major,
+                minor,
+                patch,
+            } => Self::new_lower_bounded_equal(*major, *minor, *patch),
             VersionReqVariant::MajorLess { major } => {
                 let major_leq = major.saturating_sub(1);
                 Self::new_upper_bounded_equal(major_leq, u64::MAX, u64::MAX)
-            },
+            }
             VersionReqVariant::MinorLess { major, minor } => {
                 let major_leq = major.saturating_sub(1);
                 let minor_leq = minor.saturating_sub(1);
                 Self::new_upper_bounded_equal(major_leq, minor_leq, u64::MAX)
-            },
-            VersionReqVariant::PatchLess { major, minor, patch } => {
+            }
+            VersionReqVariant::PatchLess {
+                major,
+                minor,
+                patch,
+            } => {
                 let major_leq = major.saturating_sub(1);
                 let minor_leq = minor.saturating_sub(1);
                 let patch_leq = patch.saturating_sub(1);
                 Self::new_upper_bounded_equal(major_leq, minor_leq, patch_leq)
-            },
-            VersionReqVariant::MajorLessEqual { major } => Self::new_upper_bounded_equal(*major, u64::MAX, u64::MAX),
-            VersionReqVariant::MinorLessEqual { major, minor } => Self::new_upper_bounded_equal(*major, *minor, u64::MAX),
-            VersionReqVariant::PatchLessEqual { major, minor, patch } => Self::new_upper_bounded_equal(*major, *minor, *patch),
+            }
+            VersionReqVariant::MajorLessEqual { major } => {
+                Self::new_upper_bounded_equal(*major, u64::MAX, u64::MAX)
+            }
+            VersionReqVariant::MinorLessEqual { major, minor } => {
+                Self::new_upper_bounded_equal(*major, *minor, u64::MAX)
+            }
+            VersionReqVariant::PatchLessEqual {
+                major,
+                minor,
+                patch,
+            } => Self::new_upper_bounded_equal(*major, *minor, *patch),
         }
     }
 
@@ -168,7 +192,7 @@ impl VersionReq {
             patch_lower: 0,
             major_higher: major,
             minor_higher: minor,
-            patch_higher: patch
+            patch_higher: patch,
         }
     }
 
@@ -180,7 +204,7 @@ impl VersionReq {
             patch_lower: patch,
             major_higher: u64::MAX,
             minor_higher: u64::MAX,
-            patch_higher: u64::MAX
+            patch_higher: u64::MAX,
         }
     }
 
@@ -189,11 +213,21 @@ impl VersionReq {
         let major = version.major;
         let minor = version.minor;
         let patch = version.patch;
-        VersionReq { major_lower: major, minor_lower: minor, patch_lower: patch, major_higher: major, minor_higher: minor, patch_higher: patch }
+        VersionReq {
+            major_lower: major,
+            minor_lower: minor,
+            patch_lower: patch,
+            major_higher: major,
+            minor_higher: minor,
+            patch_higher: patch,
+        }
     }
-    
+
     #[inline]
-    const fn new_compound(lower_bound: &VersionReqVariantLowerBound, upper_bound: &VersionReqVariantUpperBound) -> Self {
+    const fn new_compound(
+        lower_bound: &VersionReqVariantLowerBound,
+        upper_bound: &VersionReqVariantUpperBound,
+    ) -> Self {
         let (major_lower, minor_lower, patch_lower) = Self::new_lower_bound(lower_bound);
         let (major_higher, minor_higher, patch_higher) = Self::new_upper_bound(upper_bound);
         Self {
@@ -202,7 +236,7 @@ impl VersionReq {
             patch_lower,
             major_higher,
             minor_higher,
-            patch_higher
+            patch_higher,
         }
     }
 
@@ -212,21 +246,29 @@ impl VersionReq {
             VersionReqVariantLowerBound::MajorGreater { major } => {
                 let major_geq = major.saturating_add(1);
                 (major_geq, 0, 0)
-            },
+            }
             VersionReqVariantLowerBound::MinorGreater { major, minor } => {
                 let major_geq = major.saturating_add(1);
                 let minor_geq = minor.saturating_add(1);
                 (major_geq, minor_geq, 0)
-            },
-            VersionReqVariantLowerBound::PatchGreater { major, minor, patch } => {
+            }
+            VersionReqVariantLowerBound::PatchGreater {
+                major,
+                minor,
+                patch,
+            } => {
                 let major_geq = major.saturating_add(1);
                 let minor_geq = minor.saturating_add(1);
                 let patch_geq = patch.saturating_add(1);
                 (major_geq, minor_geq, patch_geq)
-            },
+            }
             VersionReqVariantLowerBound::MajorGreaterEqual { major } => (*major, 0, 0),
             VersionReqVariantLowerBound::MinorGreaterEqual { major, minor } => (*major, *minor, 0),
-            VersionReqVariantLowerBound::PatchGreaterEqual { major, minor, patch } => (*major, *minor, *patch),
+            VersionReqVariantLowerBound::PatchGreaterEqual {
+                major,
+                minor,
+                patch,
+            } => (*major, *minor, *patch),
         }
     }
 
@@ -236,21 +278,31 @@ impl VersionReq {
             VersionReqVariantUpperBound::MajorLess { major } => {
                 let major_leq = major.saturating_sub(1);
                 (major_leq, u64::MAX, u64::MAX)
-            },
+            }
             VersionReqVariantUpperBound::MinorLess { major, minor } => {
                 let major_leq = major.saturating_sub(1);
                 let minor_leq = minor.saturating_sub(1);
                 (major_leq, minor_leq, u64::MAX)
-            },
-            VersionReqVariantUpperBound::PatchLess { major, minor, patch } => {
+            }
+            VersionReqVariantUpperBound::PatchLess {
+                major,
+                minor,
+                patch,
+            } => {
                 let major_leq = major.saturating_sub(1);
                 let minor_leq = minor.saturating_sub(1);
                 let patch_leq = patch.saturating_sub(1);
                 (major_leq, minor_leq, patch_leq)
-            },
+            }
             VersionReqVariantUpperBound::MajorLessEqual { major } => (*major, u64::MAX, u64::MAX),
-            VersionReqVariantUpperBound::MinorLessEqual { major, minor } => (*major, *minor, u64::MAX),
-            VersionReqVariantUpperBound::PatchLessEqual { major, minor, patch } => (*major, *minor, *patch),
+            VersionReqVariantUpperBound::MinorLessEqual { major, minor } => {
+                (*major, *minor, u64::MAX)
+            }
+            VersionReqVariantUpperBound::PatchLessEqual {
+                major,
+                minor,
+                patch,
+            } => (*major, *minor, *patch),
         }
     }
 }
