@@ -2,6 +2,8 @@
 name = "fast-version"
 version = "0.1.0"
 edition = "2021"
+description = "Fast version requirenments and matching"
+license = "MIT"
 
 [workspace]
 members = [".", "fast-version-derive", "fast-version-core"]
