@@ -1,0 +1,17 @@
+[package]
+name = "fast-version"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [".", "fast-version-derive", "fast-version-core"]
+
+[dependencies]
+fast-version-core = { path = "fast-version-core" }
+fast-version-derive = { path = "fast-version-derive" }
+
+[features]
+default = ["alloc"]
+serde = ["fast-version-core/serde"]
+alloc = []
+
