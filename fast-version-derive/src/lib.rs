@@ -2,7 +2,6 @@
 //!
 //! Refer to the [fast-version](https://crates.io/crates/fast-version) for usage and documentation.
 
-#![cfg_attr(docsrs, feature(doc_cfg))]
 use litrs::Literal;
 use quote::quote;
 use std::str::FromStr;

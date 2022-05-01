@@ -34,7 +34,6 @@
 //!
 //! assert!(!VERSION_REQ_UNMATCH.matches(&VERSION));
 //! ```
-#![cfg_attr(docsrs, feature(doc_cfg))]
 pub use fast_version_core::version::Version;
 pub use fast_version_core::version_req::*;
 pub use fast_version_derive::const_version;
