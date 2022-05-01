@@ -1,6 +1,8 @@
 use crate::version::Version;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "nightly")]
+use core::simd::u64x4;
 
 /// The variants in which a version requirenment can be constructed.
 #[non_exhaustive]
@@ -104,7 +106,7 @@ impl VersionReq {
         }
     }
 
-    /// checks wether the Version Requirenment matches with the version. Returnes true if the
+    /// checks wether the Version Requirenment matches with the version. Returns true if the
     /// Requirenments are met.
     pub const fn matches(&self, version: &Version) -> bool {
         let lower_match = self.major_lower <= version.major
@@ -114,6 +116,26 @@ impl VersionReq {
             && self.minor_higher >= version.minor
             && self.patch_higher >= version.patch;
         lower_match && higher_match
+    }
+
+    /// checks wether the version requirenment matches with the version. Returns true if the
+    /// Requirenments are met.
+    /// This comparison works with SIMD, thus maybe faster.
+    ///
+    /// ```
+    /// # use fast_version_core::{version::Version, version_req::VersionReq};
+    ///
+    /// const VERSION_REQ: VersionReq = VersionReq::STAR;
+    /// const VERSION: Version = Version::new(1, 2, 3);
+    ///
+    /// assert_eq!(VERSION_REQ.matches(&VERSION), VERSION_REQ.simd_matches(&VERSION));
+    /// ```
+    #[cfg(feature = "nightly")]
+    pub fn simd_matches(&self, version: &Version) -> bool {
+        let simd_version: u64x4 = u64x4::from_array([version.major, version.minor, version.patch, 0]);
+        let simd_req_lower: u64x4 = u64x4::from_array([self.major_lower, self.minor_lower, self.patch_lower, 0]);
+        let simd_req_higher = u64x4::from_array([self.major_higher, self.minor_higher, self.patch_higher, 0]);
+        simd_req_lower.lanes_le(simd_version).all() && simd_req_higher.lanes_ge(simd_version).all()
     }
 
     /// Normal constructer of the Version Requirenment.
