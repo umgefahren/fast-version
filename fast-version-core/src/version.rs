@@ -1,13 +1,8 @@
-use lazy_static::lazy_static;
-use regex::Regex;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use thiserror::Error;
 
-lazy_static! {
-    static ref VERSION_RE: Regex = Regex::new("([0-9]+).([0-9]+).([0-9]+)").unwrap();
-}
 
 /// Version in a SemVer **like** way.
 ///
@@ -36,12 +31,44 @@ lazy_static! {
 /// assert_eq!(VERSION.minor, 2);
 /// assert_eq!(VERSION.patch, 3);
 /// ```
-#[derive(PartialEq, Eq, Hash, PartialOrd, Ord, Debug, Copy, Clone)]
+#[derive(PartialEq, Eq, Hash, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl PartialOrd for Version {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        let major_ordering = self.major.partial_cmp(&other.major);
+        if let Some(d) = major_ordering {
+            if d.is_ne() {
+                return Some(d);
+            }
+        }
+        let minor_ordering = self.minor.partial_cmp(&other.minor);
+        if let Some(d) = minor_ordering {
+            if d.is_ne() {
+                return Some(d);
+            }
+        }
+        self.patch.partial_cmp(&other.patch)
+    }
+}
+
+impl Ord for Version {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let major_ordering = self.major.cmp(&other.major);
+        if major_ordering.is_ne() {
+            return major_ordering;
+        }
+        let minor_ordering = self.minor.cmp(&other.minor);
+        if minor_ordering.is_ne() {
+            return minor_ordering;
+        }
+        self.patch.cmp(&other.patch)
+    }
 }
 
 impl Version {
@@ -62,6 +89,20 @@ impl Version {
             minor,
             patch,
         }
+    }
+
+    pub fn new_from_str(input: &str) -> Result<Self, VersionParseError> {
+        let splits: Vec<&str> = input.split('.').collect();
+        if splits.len() != 3 {
+            return Err(VersionParseError::FormatWrong);
+        }
+        let major_str = splits.get(0).unwrap();
+        let major = u64::from_str(major_str).map_err(|_| VersionParseError::MajorParseError)?;
+        let minor_str = splits.get(1).unwrap();
+        let minor = u64::from_str(minor_str).map_err(|_| VersionParseError::MinorParseError)?;
+        let patch_str = splits.get(2).unwrap();
+        let patch = u64::from_str(patch_str).map_err(|_| VersionParseError::PatchParseError)?;
+        Ok(Self::new(major, minor, patch))
     }
 }
 
@@ -86,26 +127,7 @@ pub enum VersionParseError {
 impl FromStr for Version {
     type Err = VersionParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let match_result = VERSION_RE
-            .captures(s)
-            .ok_or(VersionParseError::FormatWrong)?;
-        let major_str = match_result
-            .get(1)
-            .ok_or(VersionParseError::MajorNotFound)?
-            .as_str();
-        let minor_str = match_result
-            .get(2)
-            .ok_or(VersionParseError::MinorNotFound)?
-            .as_str();
-        let patch_str = match_result
-            .get(3)
-            .ok_or(VersionParseError::PatchNotFound)?
-            .as_str();
-        let major_num = u64::from_str(major_str).map_err(|_| VersionParseError::MajorParseError)?;
-        let minor_num = u64::from_str(minor_str).map_err(|_| VersionParseError::MinorParseError)?;
-        let patch_num = u64::from_str(patch_str).map_err(|_| VersionParseError::PatchParseError)?;
-        let ret = Version::new(major_num, minor_num, patch_num);
-        Ok(ret)
+        Self::new_from_str(s)
     }
 }
 
